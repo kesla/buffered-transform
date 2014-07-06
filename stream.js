@@ -1,9 +1,8 @@
 var factory = function (callback) {
-  var _transform = function (chunk, encoding, done) {
+  var _transform = function (stream, chunk, encoding, done) {
         var length = chunk.readUInt32LE(0)
-          , self = this
 
-        callback.call(this, chunk.slice(4, 4 + length), encoding, function (err) {
+        callback.call(stream, chunk.slice(4, 4 + length), encoding, function (err) {
           chunk = chunk.slice(4 + length)
 
           if (err)
@@ -11,11 +10,13 @@ var factory = function (callback) {
           else if (chunk.length === 0)
             done()
           else
-            _transform.call(self, chunk, encoding, done)
+            _transform(stream, chunk, encoding, done)
         })
       }
 
-  return _transform
+  return function (chunk, encoding, callback) {
+    _transform(this, chunk, encoding, callback)
+  }
 }
 
 module.exports = factory
