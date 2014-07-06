@@ -1,0 +1,14 @@
+{
+  "name": "buffered-transform-stream",
+  "version": "0.0.0",
+  "description": "A Transform-like streams2 that automatically buffer up data",
+  "main": "stream.js",
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "author": "David Björklund <david.bjorklund@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "tape": "^2.13.1"
+  }
+}
