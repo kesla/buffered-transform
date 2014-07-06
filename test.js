@@ -2,17 +2,7 @@ var Transform = require('stream').Transform
 
   , test = require('tape')
   , bufferedTransform = require('./stream')
-  , passThroughStream = function () {
-      var stream = new Transform()
 
-      stream._transform = bufferedTransform(
-        function (chunk, enc, callback) {
-          this.push(chunk)
-          callback()
-        }
-      )
-      return stream
-    }
   , collectData = function (stream, callback) {
       var data = []
 
@@ -25,7 +15,18 @@ var Transform = require('stream').Transform
     }
 
 test('stream with one chunk and one data block', function (t) {
-  var stream = passThroughStream()
+  t.plan(4)
+
+  var stream = new Transform()
+
+  stream._transform = bufferedTransform(
+    function (chunks, callback) {
+      t.equal(chunks.length, 1, 'correct number of chunks')
+      t.deepEqual(chunks[0], new Buffer([ 1, 2, 3, 4, 5 ]))
+      this.push(chunks[0])
+      callback()
+    }
+  )
 
   collectData(stream, function (err, data) {
     t.equal(data.length, 1, 'correct chunks emitted')
@@ -51,7 +52,21 @@ test('stream with chunks of different lengths', function (t) {
 })
 
 test('stream with one chunk with multiple data blocks', function (t) {
-  var stream = passThroughStream()
+  var stream = new Transform()
+
+  stream._transform = bufferedTransform(
+    function (chunks, callback) {
+      var self = this
+      t.equal(chunks.length, 3, 'correct number of chunks')
+      t.deepEqual(chunks[0], new Buffer([ 1, 2, 3 ]))
+      t.deepEqual(chunks[1], new Buffer([ 4, 7, 1, 1 ]))
+      t.deepEqual(chunks[2], new Buffer([ 9 ]))
+      chunks.forEach(function (chunk) {
+        self.push(chunk)
+      })
+      callback()
+    }
+  )
 
   collectData(stream, function (err, data) {
     t.equal(data.length, 3, 'correct chunks emitted')
