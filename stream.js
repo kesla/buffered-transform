@@ -1,17 +1,33 @@
 var factory = function (callback) {
-  var _transform = function (chunk, encoding, done) {
+  var transformBuffer = null
+    , _transform = function (chunk, encoding, done) {
         var self = this
+          , endPtr
           , ptr = 0
           , chunks = []
-          , finish = function () { callback.call(self, chunks, done) }
+          , finish = function () {
+              if (ptr !== 0)
+                transformBuffer = transformBuffer.slice(ptr)
 
-        while (ptr + 4 < chunk.length) {
-          endPtr = ptr + chunk.readUInt32LE(ptr) + 4
-          ptr += 4
-          if (endPtr > chunk.length)
+              if (chunks.length > 0)
+                callback.call(self, chunks, done)
+              else
+                done()
+            }
+
+        if (transformBuffer)
+          transformBuffer = Buffer.concat([
+              transformBuffer, chunk
+          ])
+        else
+          transformBuffer = chunk
+
+        while (ptr + 4 < transformBuffer.length) {
+          endPtr = ptr + transformBuffer.readUInt32LE(ptr) + 4
+          if (endPtr > transformBuffer.length)
             return finish()
 
-          chunks.push(chunk.slice(ptr, endPtr))
+          chunks.push(transformBuffer.slice(ptr + 4, endPtr))
           ptr = endPtr
         }
 

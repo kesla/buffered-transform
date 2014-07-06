@@ -44,11 +44,101 @@ test('stream with one chunk and one data block', function (t) {
 })
 
 test('stream with 1 byte chunks', function (t) {
-  t.end()
+  var stream = new Transform()
+    , count = 0
+    , expected = [
+          new Buffer([ 1, 2, 3 ])
+        , new Buffer([ 4, 7, 1, 1 ])
+        , new Buffer([ 9 ])
+      ]
+
+  stream._transform = bufferedTransform(
+    function (chunks, callback) {
+      var self = this
+      t.equal(chunks.length, 1, 'correct number of chunks')
+      t.deepEqual(chunks[0], expected[count])
+      count++
+      chunks.forEach(function (chunk) {
+        self.push(chunk)
+      })
+      callback()
+    }
+  )
+
+  collectData(stream, function (err, data) {
+    t.equal(data.length, 3, 'correct chunks emitted')
+    t.deepEqual(data[0], new Buffer([ 1, 2, 3 ]))
+    t.deepEqual(data[1], new Buffer([ 4, 7, 1, 1 ]))
+    t.deepEqual(data[2], new Buffer([ 9 ]))
+    t.end()
+  })
+
+  ;[
+    // size
+    3, 0, 0, 0,
+    // data
+    1, 2, 3,
+    // size
+    4, 0, 0, 0,
+    // data
+    4, 7, 1, 1,
+    // size
+    1, 0, 0, 0,
+    9
+  ].forEach(function (num) {
+    stream.write(new Buffer([ num ]))
+  })
+  stream.end()
 })
 
 test('stream with chunks of different lengths', function (t) {
-  t.end()
+  var stream = new Transform()
+    , count = 0
+    , expected = [
+          new Buffer([ 1, 2, 3 ])
+        , new Buffer([ 4, 7, 1, 1 ])
+        , new Buffer([ 9 ])
+      ]
+    , input = [
+        // size
+        3, 0, 0, 0,
+        // data
+        1, 2, 3,
+        // size
+        4, 0, 0, 0,
+        // data
+        4, 7, 1, 1,
+        // size
+        1, 0, 0, 0,
+        9
+      ]
+
+  stream._transform = bufferedTransform(
+    function (chunks, callback) {
+      var self = this
+      t.equal(chunks.length, 1, 'correct number of chunks')
+      t.deepEqual(chunks[0], expected[count])
+      count++
+      chunks.forEach(function (chunk) {
+        self.push(chunk)
+      })
+      callback()
+    }
+  )
+
+  collectData(stream, function (err, data) {
+    t.equal(data.length, 3, 'correct chunks emitted')
+    t.deepEqual(data[0], new Buffer([ 1, 2, 3 ]))
+    t.deepEqual(data[1], new Buffer([ 4, 7, 1, 1 ]))
+    t.deepEqual(data[2], new Buffer([ 9 ]))
+    t.end()
+  })
+
+  for(var i = 0; i + 4 < input.length; i += 4)
+    stream.write(new Buffer(input.slice(i, i + 4)))
+  stream.write(new Buffer(input.slice(i)))
+
+  stream.end()
 })
 
 test('stream with one chunk with multiple data blocks', function (t) {
