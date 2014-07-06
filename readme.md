@@ -1,4 +1,4 @@
-# buffered-transform
+# buffered-transform[![build status](https://secure.travis-ci.org/kesla/buffered-transform.svg)](http://travis-ci.org/kesla/buffered-transform)
 
 Buffer up data and give it to a transform-like method
 
