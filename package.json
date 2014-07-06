@@ -1,8 +1,8 @@
 {
-  "name": "buffered-transform-stream",
+  "name": "buffered-transform",
   "version": "0.0.0",
-  "description": "A Transform-like streams2 that automatically buffer up data",
-  "main": "stream.js",
+  "description": "Buffer up data and give it to a transform-like method",
+  "main": "buffered-transform.js",
   "scripts": {
     "test": "tape test.js"
   },
@@ -10,5 +10,14 @@
   "license": "MIT",
   "devDependencies": {
     "tape": "^2.13.1"
-  }
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kesla/buffered-transform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kesla/buffered-transform/issues"
+  },
+  "homepage": "https://github.com/kesla/buffered-transform"
 }
