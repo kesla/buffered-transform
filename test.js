@@ -1,7 +1,7 @@
 var Transform = require('stream').Transform
 
   , test = require('tape')
-  , bufferedTransform = require('./stream')
+  , bufferedTransform = require('./buffered-transform')
 
   , collectData = function (stream, callback) {
       var data = []
