@@ -2,10 +2,18 @@ var Transform = require('stream').Transform
 
   , test = require('tape')
   , bufferedTransform = require('./stream')
+  , collectData = function (stream, callback) {
+      var data = []
+
+      stream.on('data', function (chunk) {
+        data.push(chunk)
+      })
+      stream.once('end', function () {
+        callback(null, data)
+      })
+    }
 
 test('stream with one chunk and one data block', function (t) {
-  t.plan(2)
-
   var stream = new Transform()
 
   stream._transform = bufferedTransform(
@@ -15,12 +23,9 @@ test('stream with one chunk and one data block', function (t) {
     }
   )
 
-  stream.on('data', function (chunk) {
-    t.deepEqual(chunk, new Buffer([ 1, 2, 3, 4, 5 ]))
-  })
-
-  stream.once('end', function () {
-    t.pass('should emit end')
+  collectData(stream, function (err, data) {
+    t.equal(data.length, 1, 'correct chunks emitted')
+    t.deepEqual(data[0], new Buffer([ 1, 2, 3, 4, 5 ]))
     t.end()
   })
 
