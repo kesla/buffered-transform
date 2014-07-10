@@ -1,6 +1,6 @@
 {
   "name": "buffered-transform",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Buffer up data and give it to a transform-like method",
   "main": "buffered-transform.js",
   "scripts": {
