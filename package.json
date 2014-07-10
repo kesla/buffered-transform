@@ -11,7 +11,9 @@
   "devDependencies": {
     "tape": "^2.13.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "varint": "^3.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/kesla/buffered-transform.git"

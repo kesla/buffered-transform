@@ -1,7 +1,11 @@
-var factory = function (callback) {
+var varint = require('varint')
+
+  , factory = function (callback) {
       var transformBuffer = null
         , _transform = function (chunk, encoding, done) {
             var self = this
+              , dataSize
+              , dataSizeLength
               , endPtr
               , ptr = 0
               , chunks = []
@@ -22,12 +26,18 @@ var factory = function (callback) {
             else
               transformBuffer = chunk
 
-            while (ptr + 4 < transformBuffer.length) {
-              endPtr = ptr + transformBuffer.readUInt32LE(ptr) + 4
-              if (endPtr > transformBuffer.length)
-                return finish()
+            while(true) {
+              dataSize = varint.decode(transformBuffer, ptr)
+              dataSizeLength = varint.decode.bytes
+              if (dataSize === undefined)
+                break
 
-              chunks.push(transformBuffer.slice(ptr + 4, endPtr))
+              endPtr = ptr + dataSize + dataSizeLength
+
+              if (endPtr > transformBuffer.length)
+                break
+
+              chunks.push(transformBuffer.slice(ptr + dataSizeLength, endPtr))
               ptr = endPtr
             }
 
