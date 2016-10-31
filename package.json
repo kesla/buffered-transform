@@ -9,10 +9,10 @@
   "author": "David Björklund <david.bjorklund@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "tape": "^2.13.1"
+    "tape": "^4.6.2"
   },
   "dependencies": {
-    "varint": "^3.0.0"
+    "varint": "^4.0.1"
   },
   "repository": {
     "type": "git",
